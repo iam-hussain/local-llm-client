@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Bot, Copy, GitBranch, RefreshCw, Star, Trash2, User as UserIcon } from "lucide-react";
+import { Bot, ChevronLeft, ChevronRight, Copy, GitBranch, RefreshCw, Star, Trash2, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/markdown";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -19,6 +19,9 @@ export type MessageView = {
   generationTime?: number | null;
   stopReason?: string | null;
   starred?: boolean;
+  parentMessageId?: string | null;
+  activeVersion?: boolean;
+  createdAt?: string | null;
   streaming?: boolean;
 };
 
@@ -28,15 +31,24 @@ export function MessageBubble({
   onDelete,
   onRegenerate,
   onBranch,
+  versionIndex,
+  versionCount,
+  onPrevVersion,
+  onNextVersion,
 }: {
   message: MessageView;
   onStar?: () => void;
   onDelete?: () => void;
   onRegenerate?: () => void;
   onBranch?: () => void;
+  versionIndex?: number;
+  versionCount?: number;
+  onPrevVersion?: () => void;
+  onNextVersion?: () => void;
 }) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === "user";
+  const hasVersions = (versionCount ?? 1) > 1;
 
   const copy = () => {
     navigator.clipboard.writeText(message.content);
@@ -54,6 +66,30 @@ export function MessageBubble({
           <span className="font-medium text-foreground">{isUser ? "You" : "Assistant"}</span>
           {message.model && <span className="font-mono">{message.model}</span>}
           {message.streaming && <span className="text-amber-500">streaming…</span>}
+          {message.stopReason === "aborted" && <span className="text-amber-500">stopped</span>}
+          {hasVersions && (
+            <span className="ml-2 inline-flex items-center gap-0.5 rounded-md border bg-background px-1 py-0.5">
+              <button
+                type="button"
+                className="text-muted-foreground hover:text-foreground disabled:opacity-40"
+                onClick={onPrevVersion}
+                disabled={(versionIndex ?? 1) <= 1}
+              >
+                <ChevronLeft className="size-3" />
+              </button>
+              <span className="px-1 text-[10px] font-mono">
+                {versionIndex}/{versionCount}
+              </span>
+              <button
+                type="button"
+                className="text-muted-foreground hover:text-foreground disabled:opacity-40"
+                onClick={onNextVersion}
+                disabled={(versionIndex ?? 1) >= (versionCount ?? 1)}
+              >
+                <ChevronRight className="size-3" />
+              </button>
+            </span>
+          )}
         </div>
 
         <div className="min-w-0">

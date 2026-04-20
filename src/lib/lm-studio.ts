@@ -66,20 +66,30 @@ export async function* streamChat(opts: {
   messages: ChatMessage[];
   temperature?: number;
   max_tokens?: number;
+  top_p?: number | null;
+  top_k?: number | null;
+  repeat_penalty?: number | null;
+  stop?: string[];
   signal?: AbortSignal;
 }): AsyncGenerator<StreamChunk> {
+  const body: Record<string, unknown> = {
+    model: opts.model,
+    messages: opts.messages,
+    temperature: opts.temperature ?? 0.7,
+    max_tokens: opts.max_tokens ?? -1,
+    stream: true,
+    stream_options: { include_usage: true },
+  };
+  if (opts.top_p != null) body.top_p = opts.top_p;
+  if (opts.top_k != null) body.top_k = opts.top_k;
+  if (opts.repeat_penalty != null) body.repeat_penalty = opts.repeat_penalty;
+  if (opts.stop && opts.stop.length > 0) body.stop = opts.stop;
+
   const res = await fetch(`${BASE_URL}/api/v0/chat/completions`, {
     method: "POST",
     headers: headers(),
     signal: opts.signal,
-    body: JSON.stringify({
-      model: opts.model,
-      messages: opts.messages,
-      temperature: opts.temperature ?? 0.7,
-      max_tokens: opts.max_tokens ?? -1,
-      stream: true,
-      stream_options: { include_usage: true },
-    }),
+    body: JSON.stringify(body),
   });
   if (!res.ok || !res.body) {
     const msg = await res.text().catch(() => "");

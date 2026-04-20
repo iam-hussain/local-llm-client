@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Loader2, RefreshCw, Search } from "lucide-react";
+import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,7 +54,12 @@ export function SemanticSearch({ open, onOpenChange }: { open: boolean; onOpenCh
     try {
       const res = await fetch("/api/search", { method: "PUT" });
       const data = await res.json();
-      if (!res.ok) setError(data.error ?? "Indexing failed");
+      if (!res.ok) {
+        setError(data.error ?? "Indexing failed");
+        toast.error(data.error ?? "Indexing failed");
+      } else {
+        toast.success(`Indexed ${data.indexed} message${data.indexed === 1 ? "" : "s"}`);
+      }
     } finally {
       setIndexing(false);
     }

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Send, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { FOCUS_COMPOSER_EVENT } from "@/components/shortcuts-provider";
 
 export function ChatComposer({
   onSend,
@@ -22,6 +23,9 @@ export function ChatComposer({
 
   useEffect(() => {
     ref.current?.focus();
+    const focus = () => ref.current?.focus();
+    window.addEventListener(FOCUS_COMPOSER_EVENT, focus);
+    return () => window.removeEventListener(FOCUS_COMPOSER_EVENT, focus);
   }, []);
 
   const submit = () => {

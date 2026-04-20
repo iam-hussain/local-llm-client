@@ -37,6 +37,8 @@ export type SavedMessage = {
   timeToFirstToken: number | null;
   generationTime: number | null;
   stopReason: string | null;
+  parentMessageId?: string | null;
+  createdAt?: string | null;
 };
 
 export function useChatStream() {
@@ -64,6 +66,11 @@ export function useChatStream() {
       content: string;
       model: string;
       temperature?: number;
+      topP?: number | null;
+      topK?: number | null;
+      repeatPenalty?: number | null;
+      maxTokens?: number | null;
+      stop?: string[];
       systemPrompt?: string | null;
       regenerateAssistantId?: string;
       onUserSaved?: (id: string) => void;

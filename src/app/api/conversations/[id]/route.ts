@@ -16,8 +16,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const body = (await req.json()) as Partial<{
     title: string;
     model: string;
-    systemPrompt: string;
+    systemPrompt: string | null;
     temperature: number;
+    topP: number | null;
+    topK: number | null;
+    repeatPenalty: number | null;
+    maxTokens: number | null;
+    stopSequences: string[];
     pinned: boolean;
   }>;
   const c = await prisma.conversation.update({ where: { id }, data: body });

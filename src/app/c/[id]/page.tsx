@@ -19,6 +19,11 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
     model: c.model,
     systemPrompt: c.systemPrompt,
     temperature: c.temperature,
+    topP: c.topP,
+    topK: c.topK,
+    repeatPenalty: c.repeatPenalty,
+    maxTokens: c.maxTokens,
+    stopSequences: c.stopSequences,
     messages: c.messages.map<MessageView>((m) => ({
       id: m.id,
       role: m.role as MessageView["role"],
@@ -32,6 +37,9 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
       generationTime: m.generationTime,
       stopReason: m.stopReason,
       starred: m.starred,
+      parentMessageId: m.parentMessageId,
+      activeVersion: m.activeVersion,
+      createdAt: m.createdAt.toISOString(),
     })),
   };
   return <ChatView initial={initial} />;
